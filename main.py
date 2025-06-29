@@ -1,10 +1,23 @@
 import telebot
 import requests
 from bs4 import BeautifulSoup
+from flask import Flask
 import os
+import threading
 
+# Загрузка токена
 token = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(token)
+
+# Flask-приложение
+app = Flask(__name__)
+
+# Маршрут для проверки работоспособности
+@app.route('/')
+def index():
+    return 'Бот работает!'
+
+# Функция получения результатов экзамена
 form_url = "https://profiuniversity.uz/ru/result/form"
 submit_url = "https://profiuniversity.uz/ru/result/get"
 
@@ -34,7 +47,6 @@ def get_exam_result(key):
     submit_response = session.post(submit_url, headers=headers, data=data)
     result_soup = BeautifulSoup(submit_response.text, "html.parser")
 
-    # Извлекаем таблицу результатов
     rows = result_soup.select("table tr")
     if not rows:
         return "Результаты не найдены. Возможно, ID неверный."
@@ -46,7 +58,6 @@ def get_exam_result(key):
         if th and td:
             data[th.text.strip()] = td.text.strip()
 
-    # Формируем красивый ответ
     return f"""📄 *Результат экзамена:*
 👤 ФИО: {data.get("ФИО", "–")}
 🆔 ID: {data.get("ID", "–")}
@@ -58,6 +69,7 @@ def get_exam_result(key):
 📊 Статус: {data.get("Статус", "–")}
 """.strip()
 
+# Команды Telegram-бота
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, "Привет! Отправь мне свой ID для проверки результата экзамена.")
@@ -69,4 +81,11 @@ def handle_id(message):
     result_text = get_exam_result(user_key)
     bot.send_message(message.chat.id, result_text, parse_mode="Markdown")
 
-bot.polling(none_stop=True, interval=0)
+# Функция запуска бота в отдельном потоке
+def run_bot():
+    bot.infinity_polling()
+
+# Запуск Flask и бота
+if __name__ == '__main__':
+    threading.Thread(target=run_bot).start()
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
