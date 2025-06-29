@@ -1,10 +1,10 @@
 import telebot
 import requests
 from bs4 import BeautifulSoup
+import os
 
-TOKEN = "7766862468:AAETQFiKToB4SMhPnz38RH1GMcSz_JtdY8Y"
-bot = telebot.TeleBot(TOKEN)
-
+token = os.getenv("BOT_TOKEN")
+bot = telebot.TeleBot(token)
 form_url = "https://profiuniversity.uz/ru/result/form"
 submit_url = "https://profiuniversity.uz/ru/result/get"
 
