@@ -1,0 +1,14 @@
+Package            Version
+------------------ ---------
+beautifulsoup4     4.13.4
+bs4                0.0.2
+certifi            2025.6.15
+charset-normalizer 3.4.2
+idna               3.10
+pip                24.0
+pyTelegramBotAPI   4.27.0
+requests           2.32.4
+soupsieve          2.7
+telebot            0.0.5
+typing_extensions  4.14.0
+urllib3            2.5.0
